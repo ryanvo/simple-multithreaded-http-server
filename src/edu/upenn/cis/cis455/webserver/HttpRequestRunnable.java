@@ -4,42 +4,28 @@ import org.apache.log4j.Logger;
 
 import java.net.Socket;
 
-public class RequestRunnable implements Runnable {
-    static Logger log = Logger.getLogger(RequestRunnable.class);
+public class HttpRequestRunnable implements Runnable {
+    static Logger log = Logger.getLogger(HttpRequestRunnable.class);
 
     private Socket connection;
+    private HttpServlet servlet;
 
-    public RequestRunnable(Socket connection) {
-
+    public HttpRequestRunnable(Socket connection, HttpServlet servlet) {
+        this.servlet = servlet;
         this.connection = connection;
-
     }
 
     @Override
     public void run() throws RuntimeException {
-        Request request = new Request(connection);
+        HttpRequest request = new HttpRequest(connection);
 
         if (request.isShutdown()) {
             throw new RuntimeException();
         } else {
-            handle(request);
+            servlet.service(request, new HttpResponse());
         }
     }
 
-    private void handle(Request request)  {
-        try (
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request
-                        .getInputStream()))
-        ) {
-            String req = bufferedReader.readLine();
-            System.out.printf("Client Sent: %s\n", req);
-            log.info("Client sent: " + request);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("IOException");
-        }
-
-    }
 
 
 }
