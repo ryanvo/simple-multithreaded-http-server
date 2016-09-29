@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 
 public class PooledThread extends Thread {
 
+    static Logger log = Logger.getLogger(PooledThread.class);
     private final MyBlockingQueue pool;
-    static Logger log = Logger.getLogger(MultiThreadedServer.class);
 
     public PooledThread(MyBlockingQueue pool) {
         this.pool = pool;
@@ -21,10 +21,9 @@ public class PooledThread extends Thread {
             }
         } catch (Throwable e) {
             thrown = e;
+            log.error("Thread Exception");
         } finally {
             log.info("Thread Exited");
-
-
         }
     }
 
