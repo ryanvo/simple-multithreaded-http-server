@@ -21,7 +21,7 @@ public class PooledThread extends Thread {
             }
         } catch (Throwable e) {
             thrown = e;
-            log.error("Thread Exception");
+            log.error("Thread Exception" + e.toString());
         } finally {
             log.info("Thread Exited");
         }

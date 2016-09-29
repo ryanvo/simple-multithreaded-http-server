@@ -10,47 +10,46 @@ public class MyBlockingQueue {
 
     static Logger log = Logger.getLogger(MyBlockingQueue.class);
 
-    private Queue<Runnable> queue = new ArrayDeque<>();
+    final private Queue<Runnable> queue = new ArrayDeque<>();
     private int size;
 
     public MyBlockingQueue(int size) {
         this.size = size;
     }
 
-    public synchronized void put(Runnable request) {
-
-        try{
-            synchronized (queue) {
-                while (queue.size() == size) {
+    public void put(Runnable request) {
+        while (queue.size() == size) {
+            try {
+                synchronized (this) {
                     wait();
                 }
+            } catch (InterruptedException e) {
+                //TODO handle?
+                log.error("InterruptedException");
             }
 
-            synchronized (queue) {
-                queue.add(request);
-                notify();
-            }
+        }
 
-        } catch (InterruptedException e) {
-            //TODO handle?
-            log.error("InterruptedException");
+        synchronized (this) {
+            queue.add(request);
+            notify();
         }
 
     }
 
     public Runnable take() {
-
         try {
-            while (queue.isEmpty())
-                synchronized (queue) {
+            while (queue.isEmpty()) {
+                synchronized (this) {
                     wait();
                 }
+            }
         } catch (InterruptedException e) {
             //TODO handle?
             log.error("InterruptedException");
         }
 
-        synchronized (queue) {
+        synchronized (this) {
             notify();
             return queue.remove();
         }
