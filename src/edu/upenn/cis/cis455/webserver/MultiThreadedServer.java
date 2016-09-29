@@ -10,10 +10,12 @@ public class MultiThreadedServer {
 
     static Logger log = Logger.getLogger(MultiThreadedServer.class);
 
-    final private RequestExecutorService<Runnable> exec;
+    final private MyExecutorService exec;
+    final private HttpServlet servlet;
 
-    public MultiThreadedServer(RequestExecutorService exec) {
+    public MultiThreadedServer(MyExecutorService exec, HttpServlet servlet) {
         this.exec = exec;
+        this.servlet = servlet;
     }
 
     public void start(int port) throws IllegalStateException {
@@ -22,7 +24,7 @@ public class MultiThreadedServer {
             log.info("HTTP Server STARTED");
             while (exec.isRunning()) {
                 final Socket connection = socket.accept();
-                exec.execute(new RequestRunnable(connection));
+                exec.execute(new HttpRequestRunnable(connection, servlet));
             }
         } catch (IOException e) {
             log.error("IOException");

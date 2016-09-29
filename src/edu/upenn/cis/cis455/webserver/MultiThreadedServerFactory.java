@@ -6,9 +6,9 @@ public class MultiThreadedServerFactory {
     static MultiThreadedServer create(int poolSize, int workQueueSize) {
 
         MyBlockingQueue workQueue = new MyBlockingQueue(workQueueSize);
-        RequestExecutorService<Runnable> exec = new RequestExecutorService<>(poolSize, workQueue);
+        MyExecutorService exec = new MyExecutorService(poolSize, workQueue);
 
-        return new MultiThreadedServer(exec);
+        return new MultiThreadedServer(exec, new HttpServlet());
     }
 
 }
