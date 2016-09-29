@@ -21,8 +21,9 @@ public class MyBlockingQueue {
 
         try{
             synchronized (queue) {
-                while (queue.size() == size)
+                while (queue.size() == size) {
                     wait();
+                }
             }
 
             synchronized (queue) {

@@ -1,5 +1,6 @@
 package edu.upenn.cis.cis455.webserver;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 
@@ -10,13 +11,22 @@ public class HttpServer {
 	 */
     static Logger log = Logger.getLogger(HttpServer.class);
 
-	public static void main(String args[]) throws InterruptedException
+	public static void main(String args[])
 	{
-        log.info("Start of Http Server");
+
+        final int PORT = 8080;
+        int POOL_SIZE = 8;
+        int WORK_QUEUE_SIZE = 16;
 
 
-		
-        log.info("Http Server terminating");
+        BasicConfigurator.configure();
+
+
+
+        MultiThreadedServer server = MultiThreadedServerFactory.create(POOL_SIZE, WORK_QUEUE_SIZE);
+        server.start(PORT);
+
+        server.stop();
     }
 
 }

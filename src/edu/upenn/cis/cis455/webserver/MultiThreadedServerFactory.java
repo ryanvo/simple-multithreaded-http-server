@@ -7,9 +7,8 @@ public class MultiThreadedServerFactory {
 
         MyBlockingQueue workQueue = new MyBlockingQueue(workQueueSize);
         RequestExecutorService<Runnable> exec = new RequestExecutorService<>(poolSize, workQueue);
-        RequestBuilder requestBuilder = new RequestBuilder();
 
-        return new MultiThreadedServer(exec, requestBuilder);
+        return new MultiThreadedServer(exec);
     }
 
 }
