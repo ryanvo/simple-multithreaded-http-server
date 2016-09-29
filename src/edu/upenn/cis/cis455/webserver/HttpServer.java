@@ -24,9 +24,9 @@ public class HttpServer {
 
 
         MultiThreadedServer server = MultiThreadedServerFactory.create(POOL_SIZE, WORK_QUEUE_SIZE);
-        server.start(PORT);
 
-        
+        server.start(PORT);
+        System.exit(0);
     }
 
 }

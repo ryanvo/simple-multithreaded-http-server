@@ -16,7 +16,7 @@ public class MultiThreadedServer {
         this.exec = exec;
     }
 
-    public void start(int port) {
+    public void start(int port) throws IllegalStateException {
 
         try (ServerSocket socket = new ServerSocket(port)) {
             log.info("HTTP Server STARTED");

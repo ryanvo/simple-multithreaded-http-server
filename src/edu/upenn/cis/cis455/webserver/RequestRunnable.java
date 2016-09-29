@@ -17,25 +17,28 @@ public class RequestRunnable implements Runnable {
 
     @Override
     public void run() throws RuntimeException {
-        Request request = RequestBuilder.build(connection);
-        if (!handle(request)) {
+        Request request = new Request(connection);
+
+        if (request.isShutdown()) {
             throw new RuntimeException();
+        } else {
+            handle(request);
         }
     }
 
-    private boolean handle(Request request)  {
-//        try (
-//                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request
-//                        .getInputStream()))
-//        ) {
-//            String req = bufferedReader.readLine();
-//            System.out.printf("Client Sent: %s\n", req);
-//            log.info("Client sent: " + request);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            log.info("IOException");
-//        }
-        return true;
+    private void handle(Request request)  {
+        try (
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request
+                        .getInputStream()))
+        ) {
+            String req = bufferedReader.readLine();
+            System.out.printf("Client Sent: %s\n", req);
+            log.info("Client sent: " + request);
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("IOException");
+        }
+
     }
 
 

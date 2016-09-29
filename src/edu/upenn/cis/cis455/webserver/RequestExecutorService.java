@@ -24,18 +24,24 @@ public class RequestExecutorService<T> {
         };
 
         for (int i = 0; i < poolSize; i++) {
-            PooledThread thread = new PooledThread(queue);
+            threadPool.add(new PooledThread(queue));
+        }
+
+        for (Thread thread : threadPool) {
             thread.start();
             thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
-            threadPool.add(thread);
         }
     }
 
-    public void execute(Runnable request) {
+    public void execute(Runnable request) throws IllegalStateException{
+        if (isShutdown) {
+            throw new IllegalStateException("Executor Service is stopped");
+        }
         queue.put(request);
     }
 
     public void shutdown() {
+        isShutdown = true;
         for (Thread thread : threadPool) {
             try {
                 thread.join();
@@ -45,7 +51,6 @@ public class RequestExecutorService<T> {
             }
         }
         log.info("All threads stopped");
-        isShutdown = true;
     }
 
     public boolean isRunning() {
