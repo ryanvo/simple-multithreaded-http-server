@@ -1,44 +1,58 @@
 package edu.upenn.cis.cis455.webserver;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayDeque;
 import java.util.Queue;
 
 
-public class MyBlockingQueue<E> {
+public class MyBlockingQueue {
 
-    private Queue<E> queue = new ArrayDeque<E>();
+    static Logger log = Logger.getLogger(MyBlockingQueue.class);
+
+    private Queue<Runnable> queue = new ArrayDeque<>();
     private int size;
 
     public MyBlockingQueue(int size) {
         this.size = size;
     }
 
-    public synchronized void put(E request) {
+    public synchronized void put(Runnable request) {
 
         try{
-            while (queue.size() == size)
-                wait();
+            synchronized (queue) {
+                while (queue.size() == size)
+                    wait();
+            }
+
+            synchronized (queue) {
+                queue.add(request);
+                notify();
+            }
+
         } catch (InterruptedException e) {
             //TODO handle?
+            log.error("InterruptedException");
         }
 
     }
 
-    public synchronized E take() {
+    public Runnable take() {
 
         try {
             while (queue.isEmpty())
-                wait();
+                synchronized (queue) {
+                    wait();
+                }
         } catch (InterruptedException e) {
-
             //TODO handle?
-
+            log.error("InterruptedException");
         }
 
-        E request = queue.remove();
-        notify();
-        return request;
+        synchronized (queue) {
+            notify();
+            return queue.remove();
+        }
     }
 }
 
-}
