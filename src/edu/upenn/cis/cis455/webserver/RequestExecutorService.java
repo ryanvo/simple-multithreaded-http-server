@@ -16,9 +16,17 @@ public class RequestExecutorService<T> {
     public RequestExecutorService(int poolSize, MyBlockingQueue queue) {
         this.queue = queue;
 
+        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                shutdown();
+            }
+        };
+
         for (int i = 0; i < poolSize; i++) {
-            Thread thread = new Thread(new PooledThread(queue));
+            PooledThread thread = new PooledThread(queue);
             thread.start();
+            thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             threadPool.add(thread);
         }
     }

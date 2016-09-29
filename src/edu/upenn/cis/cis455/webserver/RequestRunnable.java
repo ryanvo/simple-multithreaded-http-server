@@ -2,23 +2,28 @@ package edu.upenn.cis.cis455.webserver;
 
 import org.apache.log4j.Logger;
 
+import java.net.Socket;
+
 public class RequestRunnable implements Runnable {
     static Logger log = Logger.getLogger(RequestRunnable.class);
 
-    private Request request;
+    private Socket connection;
 
-    public RequestRunnable(Request request) {
+    public RequestRunnable(Socket connection) {
 
-        this.request = request;
+        this.connection = connection;
 
     }
 
     @Override
-    public void run() {
-        handle(request);
+    public void run() throws RuntimeException {
+        Request request = RequestBuilder.build(connection);
+        if (!handle(request)) {
+            throw new RuntimeException();
+        }
     }
 
-    private void handle(Request request) {
+    private boolean handle(Request request)  {
 //        try (
 //                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(request
 //                        .getInputStream()))
@@ -30,6 +35,7 @@ public class RequestRunnable implements Runnable {
 //            e.printStackTrace();
 //            log.info("IOException");
 //        }
+        return true;
     }
 
 
