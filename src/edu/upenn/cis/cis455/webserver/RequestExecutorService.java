@@ -4,16 +4,15 @@ public class RequestExecutorService<T> {
 
     public RequestExecutorService<T>(int poolSize, MyBlockingQueue<T> queue) {
 
-        for (int i = 0; i < poolSize; i++) {
+        for (int i = 0; i < poolSize; i++)
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for(;;) {
+                    for (; ; ) {
                         queue.take().run();
                     }
                 }
             }).start();
-        }
 
     }
 
