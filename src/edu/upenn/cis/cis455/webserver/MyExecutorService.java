@@ -1,19 +1,18 @@
 package edu.upenn.cis.cis455.webserver;
-
 import org.apache.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class RequestExecutorService<T> {
+public class MyExecutorService {
 
-    static Logger log = Logger.getLogger(PooledThread.class);
+    static Logger log = Logger.getLogger(MyPoolThread.class);
 
-    private MyBlockingQueue queue;
     private volatile boolean isShutdown = false;
+    private MyBlockingQueue queue;
     private Set<Thread> threadPool = new HashSet<>();
 
-    public RequestExecutorService(int poolSize, MyBlockingQueue queue) {
+    public MyExecutorService(int poolSize, MyBlockingQueue queue) {
         this.queue = queue;
 
         Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
@@ -24,7 +23,7 @@ public class RequestExecutorService<T> {
         };
 
         for (int i = 0; i < poolSize; i++) {
-            threadPool.add(new PooledThread(queue));
+            threadPool.add(new MyPoolThread(queue));
         }
 
         for (Thread thread : threadPool) {

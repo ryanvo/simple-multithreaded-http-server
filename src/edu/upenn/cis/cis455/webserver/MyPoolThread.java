@@ -2,12 +2,13 @@ package edu.upenn.cis.cis455.webserver;
 import org.apache.log4j.Logger;
 
 
-public class PooledThread extends Thread {
+public class MyPoolThread extends Thread {
 
-    static Logger log = Logger.getLogger(PooledThread.class);
+    static Logger log = Logger.getLogger(MyPoolThread.class);
+
     private final MyBlockingQueue pool;
 
-    public PooledThread(MyBlockingQueue pool) {
+    public MyPoolThread(MyBlockingQueue pool) {
         this.pool = pool;
     }
 
