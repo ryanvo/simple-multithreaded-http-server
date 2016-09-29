@@ -1,22 +1,40 @@
 package edu.upenn.cis.cis455.webserver;
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-public class Server {
+public class MultiThreadedServer {
 
-    final private int PORT;
+    static Logger log = Logger.getLogger(MultiThreadedServer.class);
 
-    public Server(int port) {
+    final private RequestExecutorService<Runnable> exec;
 
-        PORT = port;
+    public MultiThreadedServer(RequestExecutorService exec) {
+        this.exec = exec;
+    }
+
+    public void start(int port) {
+
+        try (ServerSocket socket = new ServerSocket(port)) {
+            log.info("HTTP Server STARTED");
+            while (exec.isRunning()) {
+                final Socket connection = socket.accept();
+                exec.execute(new RequestRunnable(connection));
+            }
+        } catch (IOException e) {
+            log.error("IOException");
+            e.printStackTrace();
+        } finally {
+            log.info("Server STOPPED");
+        }
 
     }
 
-    public void start() throws IOException {
-
-
-
+    public void stop() {
+        exec.shutdown();
     }
-
 
 }
