@@ -17,42 +17,36 @@ public class MyBlockingQueue {
         this.size = size;
     }
 
-    public void put(Runnable request) {
+    public synchronized void put(Runnable request) {
         while (queue.size() == size) {
             try {
-                synchronized (this) {
-                    wait();
-                }
+                wait();
+
             } catch (InterruptedException e) {
                 //TODO handle?
                 log.error("InterruptedException");
             }
-
         }
 
-        synchronized (this) {
-            queue.add(request);
-            notify();
-        }
+        queue.add(request);
+        notify();
+
 
     }
 
-    public Runnable take() {
+    public synchronized Runnable take() {
         try {
             while (queue.isEmpty()) {
-                synchronized (this) {
-                    wait();
-                }
+                wait();
             }
         } catch (InterruptedException e) {
             //TODO handle?
             log.error("InterruptedException");
         }
 
-        synchronized (this) {
-            notify();
-            return queue.remove();
-        }
+        notify();
+        return queue.remove();
+
     }
 }
 
