@@ -12,19 +12,22 @@ public class HttpRequest {
 
 
     private boolean isShutdown;
-    private String header;
     private File fileRequested;
     private String requestURL;
-    private String method;
     private Map<String, String> headers;
+
     private Socket connection;
+    private String method;
+    private String uri;
+    private String contentType;
+    private String contentLength;
 
     private InputStream inputStream;
 
 
     public HttpRequest(Socket connection) {
         this.connection = connection;
-        init(connection);
+        parseRequest(connection);
     }
 
     public boolean isShutdown() {
@@ -32,11 +35,7 @@ public class HttpRequest {
     }
 
     public String getRequestURI() {
-        return null;
-    }
-
-    public StringBuilder getRequestURL() {
-        return null;
+        return uri;
     }
 
     public String getMethod() {
@@ -48,20 +47,25 @@ public class HttpRequest {
         return connection.getInputStream();
     }
 
-    private void init(Socket connection) {
+    private void parseRequest(Socket connection) {
         try (BufferedReader in = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()));
         ) {
+            log.info("Reading HttpRequest from socket");
 
+            String line = in.readLine();
+            log.info("Status: " + line);
 
+            String[] statusLine = line.split(" ");
+            method = statusLine[0];
+            uri = statusLine[1];
 
-        } catch (IOException e){
+            isShutdown = (uri.equals("/shutdown") || uri.equals("/shutdown/"));
+
+        } catch (IOException e) {
             log.error("Socket IOException");
-        } finally {
-            log.info("HttpRequest was read from socket.");
         }
-
-
+        log.info(String.format("HttpRequest parsed with Method: %s, Uri: %s", method, uri));
     }
 
 }

@@ -8,6 +8,8 @@ public class MyPoolThread extends Thread {
 
     private final MyBlockingQueue pool;
 
+    private Runnable runnable;
+
     public MyPoolThread(MyBlockingQueue pool) {
         this.pool = pool;
     }
@@ -18,7 +20,8 @@ public class MyPoolThread extends Thread {
         try{
             log.info("Thread Started");
             while (!isInterrupted()) {
-                pool.take().run();
+                runnable = pool.take();
+                runnable.run();
             }
         } catch (Throwable e) {
             thrown = e;

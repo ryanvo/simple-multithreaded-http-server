@@ -21,17 +21,13 @@ public class MyBlockingQueue {
         while (queue.size() == size) {
             try {
                 wait();
-
             } catch (InterruptedException e) {
-                //TODO handle?
                 log.error("InterruptedException");
             }
         }
 
         queue.add(request);
         notify();
-
-
     }
 
     public synchronized Runnable take() {
@@ -40,13 +36,11 @@ public class MyBlockingQueue {
                 wait();
             }
         } catch (InterruptedException e) {
-            //TODO handle?
             log.error("InterruptedException");
         }
 
         notify();
         return queue.remove();
-
     }
 }
 

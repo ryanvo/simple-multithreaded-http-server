@@ -9,6 +9,7 @@ public class HttpRequestRunnable implements Runnable {
 
     private Socket connection;
     private HttpServlet servlet;
+    private ThreadManager manager;
 
     public HttpRequestRunnable(Socket connection, HttpServlet servlet) {
         this.servlet = servlet;
@@ -19,10 +20,11 @@ public class HttpRequestRunnable implements Runnable {
     public void run() throws RuntimeException {
         HttpRequest request = new HttpRequest(connection);
 
+
         if (request.isShutdown()) {
             throw new RuntimeException();
         } else {
-            servlet.service(request, new HttpResponse());
+            servlet.service(request, new HttpResponse(connection));
         }
     }
 
