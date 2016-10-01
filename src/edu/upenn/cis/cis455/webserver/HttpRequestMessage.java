@@ -30,27 +30,31 @@ public class HttpRequestMessage {
     }
 
     private void parseRequest(Socket connection) throws URISyntaxException {
+
+        String line;
         try  {
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            line = in.readLine();
 
-            String line = in.readLine();
-            log.info("Parsing HTTP Request: " + line);
-
-            String[] statusLine = line.split(" ");
-            method = statusLine[0];
-            uri = new URI(statusLine[1]);
-
-            if (uri.getPath().matches("/+control/*$")) {
-                type = "control";
-            } else if (uri.getPath().matches("/+shutdown/*$")) {
-                type = "shutdown";
-            } else if (method.equals("GET")) {
-                type = "get";
-            }
-
-        } catch (IOException e) {
+        } catch (IOException e) { //TODO throw at constructor
             log.error("Socket IOException", e);
+            return;
         }
+
+        log.info("Parsing HTTP Request: " + line);
+
+        String[] statusLine = line.split(" ");
+        method = statusLine[0];
+        uri = new URI(statusLine[1]);
+
+        if (uri.getPath().matches("/+control/*$")) {
+            type = "control";
+        } else if (uri.getPath().matches("/+shutdown/*$")) {
+            type = "shutdown";
+        } else if (method.equals("GET")) {
+            type = "get";
+        }
+
         log.info(String.format("HttpRequestMessage Parsed %s Request with URI %s", method, uri));
     }
 

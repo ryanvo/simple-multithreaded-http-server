@@ -24,13 +24,14 @@ public class MultiThreadedServer {
             log.info(String.format("HTTP Server Started on Port %d", port));
             while (exec.isRunning()) {
                 final Socket connection = socket.accept();
-                exec.execute(new HttpRequestRunnable(connection, servlet));
+                try {
+                    exec.execute(new HttpRequestRunnable(connection, servlet));
+                } catch (IllegalStateException e) {
+                    log.info("Server Shutdown"); //TODO handle this bc its not rly down yet
+                }
             }
         } catch (IOException e) {
-            log.error("HTTP Server Could Not Open Port " + port);
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            log.info("Server Shutdown");
+            log.error("HTTP Server Could Not Open Port " + port, e);
         }
     }
 

@@ -4,11 +4,13 @@ import org.apache.log4j.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.Thread.sleep;
+
 public class MyExecutorService {
 
     static Logger log = Logger.getLogger(MyPoolThread.class);
 
-    private volatile boolean isShutdown = false;
+    private volatile boolean isRunning = true;
     private MyBlockingQueue queue;
     private Set<MyPoolThread> threadPool = new HashSet<>();
 
@@ -25,23 +27,38 @@ public class MyExecutorService {
     }
 
     public void execute(Runnable request) throws IllegalStateException {
-        if (isShutdown) {
+        if (!isRunning) {
             throw new IllegalStateException("Executor Service is stopped");
         }
         queue.put(request);
     }
 
     public void shutdown() {
-        isShutdown = true;
+        isRunning = false;
+
+
+        while (!queue.isEmpty()) { //TODO graceful shutdown
+            try {
+                sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         for (MyPoolThread thread : threadPool) {
             thread.shutdown();
+        }
+
+
+        for (MyPoolThread thread : threadPool) {
             try {
-                thread.join();
+                thread.join(1000);
             } catch (InterruptedException e) {
                 thread.interrupt();
                 log.error("Interrupted Exception");
             }
         }
+
         log.info("All threads stopped");
     }
 
@@ -50,7 +67,7 @@ public class MyExecutorService {
     }
 
     public boolean isRunning() {
-        return !isShutdown;
+        return isRunning;
     }
 
 }

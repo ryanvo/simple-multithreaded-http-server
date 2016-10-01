@@ -59,6 +59,7 @@ public class HttpServlet {
             response.setVersion(HTTP_VERSION);
             response.setStatusCode("200");
             response.setErrorMessage("OK");
+
             try {
                 response.setContentType(Files.probeContentType(fileRequested.toPath()));
             } catch (IOException e) {
@@ -67,7 +68,6 @@ public class HttpServlet {
             response.setContentLength(Long.valueOf(fileRequested.length()).intValue());
 
         } else {
-
             log.info(String.format("%s Not found", fileRequested.getName()));
 
             response.setVersion(HTTP_VERSION);
@@ -82,6 +82,7 @@ public class HttpServlet {
         try (PrintWriter writer = new PrintWriter(response.getOutputStream())) {
             writer.println(response.getStatusAndHeader());
             writer.flush();
+
             if (fileRequested.canRead()) {
                 Files.copy(fileRequested.toPath(), response.getOutputStream());
                 log.info(String.format("%s Sent to Client", fileRequested.getName()));
@@ -90,6 +91,7 @@ public class HttpServlet {
                 log.info(String.format("Not Found Error Sent to Client", request.getRequestURI()
                         .getPath()));
             }
+
         } catch (IOException e) {
             log.error("Could Not Write GET Response to Socket", e);
 
@@ -129,8 +131,10 @@ public class HttpServlet {
         response.setContentLength(SHUTDOWN_MESSAGE.length());
 
 
-        try (PrintWriter writer = new PrintWriter(response.getOutputStream(), true))
+        try //TODO close with resources
         {
+            PrintWriter writer = new PrintWriter(response.getOutputStream(), true);
+
             log.debug(response.getStatusAndHeader());
 
             writer.println(response.getStatusAndHeader());
@@ -140,11 +144,11 @@ public class HttpServlet {
             log.error("Could Not Write Shutdown HTML Page to Socket", e);
         }
 
-//        try {
-//            response.getOutputStream().close();
-//        } catch (IOException e) {
-//            log.error("Could Not Close Socket After Sending Shutdown HTML Page", e);
-//        }
+        try {
+            response.getOutputStream().close();
+        } catch (IOException e) {
+            log.error("Could Not Close Socket After Sending Shutdown HTML Page", e);
+        }
 
         manager.issueShutdown();
 

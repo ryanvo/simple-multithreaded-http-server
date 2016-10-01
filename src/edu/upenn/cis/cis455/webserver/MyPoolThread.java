@@ -15,15 +15,13 @@ public class MyPoolThread extends Thread {
 
     @Override
     public void run() {
-        try{
-            log.info("Thread Started");
-            while (!isInterrupted() && !isShutdown) {
-                pool.take().run();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            log.error("Runnable Exception in Thread");
+
+        log.info("Thread Started");
+
+        while (!isInterrupted() && !isShutdown) {
+            pool.take().run();
         }
+
         log.info("Thread Closed");
     }
 

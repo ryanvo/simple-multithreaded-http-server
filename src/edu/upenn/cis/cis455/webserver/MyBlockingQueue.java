@@ -31,16 +31,21 @@ public class MyBlockingQueue {
     }
 
     public synchronized Runnable take() {
-        try {
-            while (queue.isEmpty()) {
+        while (queue.isEmpty()) {
+            try {
                 wait();
+            } catch (InterruptedException e) {
+                log.error("InterruptedException");
             }
-        } catch (InterruptedException e) {
-            log.error("InterruptedException");
         }
 
         notify();
         return queue.remove();
     }
+
+    public synchronized boolean isEmpty() {
+        return queue.isEmpty();
+    }
+
 }
 

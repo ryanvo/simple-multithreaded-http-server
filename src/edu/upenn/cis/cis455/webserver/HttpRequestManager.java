@@ -1,16 +1,16 @@
 package edu.upenn.cis.cis455.webserver;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class HttpRequestManager {
 
-    private Map<Long, String> idToUri;
+    private final Map<Long, String> idToUri;
     private final MyExecutorService executorService;
 
     public HttpRequestManager(MyExecutorService executorService) {
-        idToUri = new HashMap<>();
+        idToUri = new ConcurrentHashMap<>();
         this.executorService = executorService;
         for (Thread thread : executorService.threadPool()) {
             update(thread.getId(), "waiting");
