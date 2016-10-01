@@ -48,7 +48,6 @@ public class HttpRequestMessage {
                 type = "get";
             }
 
-
         } catch (IOException e) {
             log.error("Socket IOException", e);
         }

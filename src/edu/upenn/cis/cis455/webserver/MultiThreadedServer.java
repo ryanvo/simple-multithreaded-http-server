@@ -21,7 +21,7 @@ public class MultiThreadedServer {
     public void start(int port) {
 
         try (ServerSocket socket = new ServerSocket(port)) {
-            log.info("HTTP Server Started");
+            log.info(String.format("HTTP Server Started on Port %d", port));
             while (exec.isRunning()) {
                 final Socket connection = socket.accept();
                 exec.execute(new HttpRequestRunnable(connection, servlet));

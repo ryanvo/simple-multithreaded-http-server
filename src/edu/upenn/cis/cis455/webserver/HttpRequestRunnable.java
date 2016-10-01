@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 
 public class HttpRequestRunnable implements Runnable {
+
     static Logger log = Logger.getLogger(HttpRequestRunnable.class);
 
     private Socket connection;
@@ -23,15 +24,16 @@ public class HttpRequestRunnable implements Runnable {
             servlet.service(new HttpRequestMessage(connection), new HttpResponseMessage
                     (connection));
         } catch (IllegalStateException e) {
-            e.printStackTrace();
-            log.error("Invalid Request Ignored");
+            log.error("Invalid Request Ignored", e);
         } catch (URISyntaxException e) {
-
+            log.error("URI Could Not Be Processed", e);
         }
+
         try {
             connection.close();
+            log.info("Socket Closed");
         } catch (IOException e) {
-            log.error("Could Not Close Socket After Sending Response");
+            log.error("Could Not Close Socket After Sending Response", e);
         }
     }
 
