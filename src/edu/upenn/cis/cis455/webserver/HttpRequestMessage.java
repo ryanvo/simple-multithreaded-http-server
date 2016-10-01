@@ -2,31 +2,22 @@ package edu.upenn.cis.cis455.webserver;
 
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class HttpRequestMessage {
 
     static Logger log = Logger.getLogger(HttpRequestMessage.class);
 
-    private boolean isShutdown;
-    private File fileRequested;
-    private String requestURL;
-    private Map<String, String> headers;
-
-    private Socket connection;
     private String method;
-    private String uri;
+    private URI uri;
     private String type;
-    private String contentType;
-    private String contentLength;
 
-    private InputStream inputStream;
-
-
-    public HttpRequestMessage(Socket connection) {
-        this.connection = connection;
+    public HttpRequestMessage(Socket connection) throws URISyntaxException {
         parseRequest(connection);
     }
 
@@ -34,44 +25,34 @@ public class HttpRequestMessage {
         return type;
     }
 
-    public String getRequestURI() {
+    public URI getRequestURI() {
         return uri;
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-
-    public InputStream getInputStream() throws IOException {
-        return connection.getInputStream();
-    }
-
-    private void parseRequest(Socket connection) {
+    private void parseRequest(Socket connection) throws URISyntaxException {
         try  {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream
-                    ()));
-            log.info("Parsing HTTP Request");
             String line = in.readLine();
-            log.info("Status: " + line);
+            log.info("Parsing HTTP Request: " + line);
 
             String[] statusLine = line.split(" ");
             method = statusLine[0];
-            uri = statusLine[1];
+            uri = new URI(statusLine[1]);
 
-            if (uri.equals("/shutdown") || uri.equals("/shutdown/")) {
-               type = "shutdown";
-            } else if (uri.matches("/*control/*")) {
+            if (uri.getPath().matches("/+control/*$")) {
                 type = "control";
-            } else {
-                type = "else";
+            } else if (uri.getPath().matches("/+shutdown/*$")) {
+                type = "shutdown";
+            } else if (method.equals("GET")) {
+                type = "get";
             }
 
+
         } catch (IOException e) {
-            log.error("Socket IOException");
+            log.error("Socket IOException", e);
         }
-        log.info(String.format("HttpRequestMessage parsed with Method: %s, Uri: %s", method, uri));
+        log.info(String.format("HttpRequestMessage Parsed %s Request with URI %s", method, uri));
     }
 
 }

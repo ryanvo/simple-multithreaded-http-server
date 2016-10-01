@@ -11,12 +11,13 @@ import java.util.TimeZone;
 
 public class HttpResponseMessage {
 
+    private final String SERVER_HEADER = "Server: ryanvo/55.5";
     private String version;
     private String statusCode;
     private String errorMessage;
     private String date;
     private String contentType;
-    private String contentLength;
+    private int contentLength;
 
     private final Socket connection;
 
@@ -41,7 +42,7 @@ public class HttpResponseMessage {
         this.contentType = contentType;
     }
 
-    public void setContentLength(String contentLength) {
+    public void setContentLength(int contentLength) {
         this.contentLength = contentLength;
     }
 
@@ -55,9 +56,8 @@ public class HttpResponseMessage {
                 .append(date).append('\n')
                 .append("Content-Type: ").append(contentType).append('\n')
                 .append(contentLength).append('\n')
-                .append("Server: ryanvo/55.5").append('\n')
-                .append("Connection: close").append('\n')
-                .append('\n');
+                .append(SERVER_HEADER).append('\n')
+                .append("Connection: close").append('\n');
         return sb.toString();
     }
 
