@@ -14,13 +14,12 @@ public class MyExecutorService {
 
     public MyExecutorService(int poolSize, MyBlockingQueue queue) {
         this.queue = queue;
-
-        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                shutdown();
-            }
-        };
+//        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+//            @Override
+//            public void uncaughtException(Thread t, Throwable e) {
+//                shutdown();
+//            }
+//        };
 
         for (int i = 0; i < poolSize; i++) {
             threadPool.add(new MyPoolThread(queue));
@@ -28,7 +27,7 @@ public class MyExecutorService {
 
         for (Thread thread : threadPool) {
             thread.start();
-            thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+//            thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         }
     }
 
@@ -50,6 +49,10 @@ public class MyExecutorService {
             }
         }
         log.info("All threads stopped");
+    }
+
+    public Set<Thread> getThreadPool() {
+        return threadPool;
     }
 
     public boolean isRunning() {

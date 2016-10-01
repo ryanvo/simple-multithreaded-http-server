@@ -6,10 +6,9 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Map;
 
-public class HttpRequest {
+public class HttpRequestMessage {
 
-    static Logger log = Logger.getLogger(HttpRequest.class);
-
+    static Logger log = Logger.getLogger(HttpRequestMessage.class);
 
     private boolean isShutdown;
     private File fileRequested;
@@ -19,19 +18,20 @@ public class HttpRequest {
     private Socket connection;
     private String method;
     private String uri;
+    private String type;
     private String contentType;
     private String contentLength;
 
     private InputStream inputStream;
 
 
-    public HttpRequest(Socket connection) {
+    public HttpRequestMessage(Socket connection) {
         this.connection = connection;
         parseRequest(connection);
     }
 
-    public boolean isShutdown() {
-        return isShutdown;
+    public String getType() {
+        return type;
     }
 
     public String getRequestURI() {
@@ -48,11 +48,11 @@ public class HttpRequest {
     }
 
     private void parseRequest(Socket connection) {
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));
-        ) {
-            log.info("Reading HttpRequest from socket");
+        try  {
 
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream
+                    ()));
+            log.info("Parsing HTTP Request");
             String line = in.readLine();
             log.info("Status: " + line);
 
@@ -60,12 +60,18 @@ public class HttpRequest {
             method = statusLine[0];
             uri = statusLine[1];
 
-            isShutdown = (uri.equals("/shutdown") || uri.equals("/shutdown/"));
+            if (uri.equals("/shutdown") || uri.equals("/shutdown/")) {
+               type = "shutdown";
+            } else if (uri.matches("/*control/*")) {
+                type = "control";
+            } else {
+                type = "else";
+            }
 
         } catch (IOException e) {
             log.error("Socket IOException");
         }
-        log.info(String.format("HttpRequest parsed with Method: %s, Uri: %s", method, uri));
+        log.info(String.format("HttpRequestMessage parsed with Method: %s, Uri: %s", method, uri));
     }
 
 }

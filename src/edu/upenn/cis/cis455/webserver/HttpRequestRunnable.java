@@ -2,6 +2,7 @@ package edu.upenn.cis.cis455.webserver;
 
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.net.Socket;
 
 public class HttpRequestRunnable implements Runnable {
@@ -9,7 +10,6 @@ public class HttpRequestRunnable implements Runnable {
 
     private Socket connection;
     private HttpServlet servlet;
-    private ThreadManager manager;
 
     public HttpRequestRunnable(Socket connection, HttpServlet servlet) {
         this.servlet = servlet;
@@ -17,18 +17,14 @@ public class HttpRequestRunnable implements Runnable {
     }
 
     @Override
-    public void run() throws RuntimeException {
-        HttpRequest request = new HttpRequest(connection);
-
-
-        if (request.isShutdown()) {
-            throw new RuntimeException();
-        } else {
-            servlet.service(request, new HttpResponse(connection));
+    public void run() {
+        servlet.service(new HttpRequestMessage(connection), new HttpResponseMessage(connection));
+        try {
+            connection.close();
+        } catch (IOException e) {
+            log.error("Could not close socket");
         }
     }
-
-
 
 }
 

@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
-public class HttpResponse {
-
-    final private String server = "ryanvo/9.30";
-    final private String connectionClose = "Connection: close";
+public class HttpResponseMessage {
 
     private String version;
     private String statusCode;
@@ -21,7 +20,7 @@ public class HttpResponse {
 
     private final Socket connection;
 
-    public HttpResponse(Socket connection) {
+    public HttpResponseMessage(Socket connection) {
         this.connection = connection;
         date = getHttpDate();
     }
@@ -48,6 +47,18 @@ public class HttpResponse {
 
     public OutputStream getOutputStream() throws IOException {
         return connection.getOutputStream();
+    }
+
+    public String getStatusAndHeader() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(version).append(" ").append(statusCode).append(" ").append(errorMessage).append('\n')
+                .append(date).append('\n')
+                .append("Content-Type: ").append(contentType).append('\n')
+                .append(contentLength).append('\n')
+                .append("Server: ryanvo/55.5").append('\n')
+                .append("Connection: close").append('\n')
+                .append('\n');
+        return sb.toString();
     }
 
     public static String getHttpDate() {
