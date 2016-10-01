@@ -7,7 +7,7 @@ public class MultiThreadedServerFactory {
 
         MyBlockingQueue workQueue = new MyBlockingQueue(workQueueSize);
         MyExecutorService exec = new MyExecutorService(poolSize, workQueue);
-        HttpRequestManager manager = new HttpRequestManager(exec.getThreadPool());
+        HttpRequestManager manager = new HttpRequestManager(exec);
         HttpServlet servlet = new HttpServlet(manager);
 
         return new MultiThreadedServer(exec, servlet);

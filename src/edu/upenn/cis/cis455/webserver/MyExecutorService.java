@@ -10,16 +10,10 @@ public class MyExecutorService {
 
     private volatile boolean isShutdown = false;
     private MyBlockingQueue queue;
-    private Set<Thread> threadPool = new HashSet<>();
+    private Set<MyPoolThread> threadPool = new HashSet<>();
 
     public MyExecutorService(int poolSize, MyBlockingQueue queue) {
         this.queue = queue;
-//        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
-//            @Override
-//            public void uncaughtException(Thread t, Throwable e) {
-//                shutdown();
-//            }
-//        };
 
         for (int i = 0; i < poolSize; i++) {
             threadPool.add(new MyPoolThread(queue));
@@ -27,11 +21,10 @@ public class MyExecutorService {
 
         for (Thread thread : threadPool) {
             thread.start();
-//            thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         }
     }
 
-    public void execute(Runnable request) throws IllegalStateException{
+    public void execute(Runnable request) throws IllegalStateException {
         if (isShutdown) {
             throw new IllegalStateException("Executor Service is stopped");
         }
@@ -40,7 +33,8 @@ public class MyExecutorService {
 
     public void shutdown() {
         isShutdown = true;
-        for (Thread thread : threadPool) {
+        for (MyPoolThread thread : threadPool) {
+            thread.shutdown();
             try {
                 thread.join();
             } catch (InterruptedException e) {
@@ -51,7 +45,7 @@ public class MyExecutorService {
         log.info("All threads stopped");
     }
 
-    public Set<Thread> getThreadPool() {
+    public Set<MyPoolThread> threadPool() {
         return threadPool;
     }
 

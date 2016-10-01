@@ -18,21 +18,20 @@ public class MultiThreadedServer {
         this.servlet = servlet;
     }
 
-    public void start(int port) throws IllegalStateException {
+    public void start(int port) {
 
         try (ServerSocket socket = new ServerSocket(port)) {
-            log.info("HTTP Server STARTED");
+            log.info("HTTP Server Started");
             while (exec.isRunning()) {
                 final Socket connection = socket.accept();
                 exec.execute(new HttpRequestRunnable(connection, servlet));
             }
         } catch (IOException e) {
-            log.error("IOException");
+            log.error("HTTP Server Could Not Open Port " + port);
             e.printStackTrace();
-        } finally {
-            log.info("Server STOPPED");
+        } catch (IllegalStateException e) {
+            log.info("Server Shutdown");
         }
-
     }
 
     public void stop() {
