@@ -22,6 +22,7 @@ public class HttpServer {
                 WORK_QUEUE_SIZE);
         server.start(port);
 
+        log.info("Exiting Main");
         System.exit(0);
     }
 

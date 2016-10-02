@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class MultiThreadedServer {
 
@@ -20,23 +21,25 @@ public class MultiThreadedServer {
 
     public void start(int port) {
 
-        try (ServerSocket socket = new ServerSocket(port)) {
+        try {
+            ServerSocket socket = new ServerSocket(port);
+            servlet.setServerSocket(socket);
             log.info(String.format("HTTP Server Started on Port %d", port));
             while (exec.isRunning()) {
-                final Socket connection = socket.accept();
                 try {
+                    Socket connection = socket.accept();
                     exec.execute(new HttpRequestRunnable(connection, servlet));
                 } catch (IllegalStateException e) {
-                    log.info("Server Shutdown"); //TODO handle this bc its not rly down yet
+                    log.error("Socket Created Between Client But Executor is Stopped");
                 }
             }
+        } catch (SocketException e) {
+            log.info("ServerSocket Closed Due To Shutdown Request");
         } catch (IOException e) {
             log.error("HTTP Server Could Not Open Port " + port, e);
         }
-    }
 
-    public void stop() {
-        exec.shutdown();
+        log.info("Server Successfully Shutdown");
     }
 
 }

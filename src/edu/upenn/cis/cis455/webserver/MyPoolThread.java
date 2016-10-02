@@ -7,7 +7,7 @@ public class MyPoolThread extends Thread {
     static Logger log = Logger.getLogger(MyPoolThread.class);
 
     private final MyBlockingQueue pool;
-    private boolean isShutdown = false;
+    private volatile boolean isRunning = true;
 
     public MyPoolThread(MyBlockingQueue pool) {
         this.pool = pool;
@@ -17,15 +17,14 @@ public class MyPoolThread extends Thread {
     public void run() {
 
         log.info("Thread Started");
-
-        while (!isInterrupted() && !isShutdown) {
-            pool.take().run();
+        while (!isInterrupted()) {
+            try {
+                pool.take().run();
+            } catch (InterruptedException e) {
+                break;
+            }
         }
-
-        log.info("Thread Closed");
+        log.info("Thread Stopped");
     }
 
-    public void shutdown() {
-        isShutdown = true;
-    }
 }

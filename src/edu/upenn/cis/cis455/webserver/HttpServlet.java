@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 
 public class HttpServlet {
@@ -18,10 +19,15 @@ public class HttpServlet {
 
     private final String rootDirectory;
     private HttpRequestManager manager;
+    private ServerSocket serverSocket;
 
     public HttpServlet(String rootDirectory, HttpRequestManager manager) {
         this.rootDirectory = rootDirectory;
         this.manager = manager;
+    }
+
+    public void setServerSocket(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
     }
 
     public void service(HttpRequestMessage request, HttpResponseMessage response) {
@@ -124,6 +130,15 @@ public class HttpServlet {
     public void doShutdown(HttpResponseMessage response) {
 
         log.info("HttpServlet Serving Shutdown Request");
+
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            log.error("Could not close socket. Server will not shutdown");
+        }
+        log.info("Server Socket Closed");
+        manager.issueShutdown();
+
         response.setVersion(HTTP_VERSION);
         response.setStatusCode("200");
         response.setErrorMessage("OK");
@@ -131,9 +146,7 @@ public class HttpServlet {
         response.setContentLength(SHUTDOWN_MESSAGE.length());
 
 
-        try //TODO close with resources
-        {
-            PrintWriter writer = new PrintWriter(response.getOutputStream(), true);
+        try(PrintWriter writer = new PrintWriter(response.getOutputStream(), true)) {
 
             log.debug(response.getStatusAndHeader());
 
@@ -143,14 +156,6 @@ public class HttpServlet {
         } catch (IOException e) {
             log.error("Could Not Write Shutdown HTML Page to Socket", e);
         }
-
-        try {
-            response.getOutputStream().close();
-        } catch (IOException e) {
-            log.error("Could Not Close Socket After Sending Shutdown HTML Page", e);
-        }
-
-        manager.issueShutdown();
 
     }
 

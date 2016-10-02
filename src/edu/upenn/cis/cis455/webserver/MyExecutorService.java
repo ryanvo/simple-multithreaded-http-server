@@ -4,8 +4,6 @@ import org.apache.log4j.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.lang.Thread.sleep;
-
 public class MyExecutorService {
 
     static Logger log = Logger.getLogger(MyPoolThread.class);
@@ -36,27 +34,14 @@ public class MyExecutorService {
     public void shutdown() {
         isRunning = false;
 
-
         while (!queue.isEmpty()) { //TODO graceful shutdown
             try {
-                sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                Thread.sleep(500);
+            } catch (InterruptedException ignore) {}
         }
 
         for (MyPoolThread thread : threadPool) {
-            thread.shutdown();
-        }
-
-
-        for (MyPoolThread thread : threadPool) {
-            try {
-                thread.join(1000);
-            } catch (InterruptedException e) {
                 thread.interrupt();
-                log.error("Interrupted Exception");
-            }
         }
 
         log.info("All threads stopped");

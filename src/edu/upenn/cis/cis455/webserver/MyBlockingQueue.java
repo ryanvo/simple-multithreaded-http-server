@@ -22,7 +22,7 @@ public class MyBlockingQueue {
             try {
                 wait();
             } catch (InterruptedException e) {
-                log.error("InterruptedException");
+                log.error("Interrupted Exception in put?", e);
             }
         }
 
@@ -30,20 +30,16 @@ public class MyBlockingQueue {
         notify();
     }
 
-    public synchronized Runnable take() {
+    public synchronized Runnable take() throws InterruptedException {
         while (queue.isEmpty()) {
-            try {
                 wait();
-            } catch (InterruptedException e) {
-                log.error("InterruptedException");
-            }
         }
 
         notify();
         return queue.remove();
     }
 
-    public synchronized boolean isEmpty() {
+    public boolean isEmpty() {
         return queue.isEmpty();
     }
 
