@@ -56,7 +56,7 @@ public class HttpResponseMessage {
                 .append("Date: ").append(date).append('\n')
                 .append("Content-Type: ").append(contentType).append('\n')
                 .append("Content-Length: ").append(contentLength).append('\n')
-                .append("Connection: close").append('\n');
+                .append("Connection: Keep-Alive").append('\n');
         return sb.toString();
     }
 

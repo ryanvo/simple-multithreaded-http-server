@@ -8,14 +8,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HttpServlet {
 
     static Logger log = Logger.getLogger(HttpServlet.class);
 
-    private String HTTP_VERSION = "HTTP/1.0";
-    private String NOT_FOUND_MESSAGE = "<html><body><h1>404 File Not Found</h1></body></html>";
-    private String SHUTDOWN_MESSAGE = "<html><body>Server shutting down...</body></html>";
+    private final String HTTP_VERSION = "HTTP/1.1";
 
     private final String rootDirectory;
     private HttpRequestManager manager;
@@ -56,47 +56,85 @@ public class HttpServlet {
     }
 
     public void doGet(HttpRequestMessage request, HttpResponseMessage response) {
+
+        String NOT_FOUND_MESSAGE = "<html><body><h1>404 File Not Found</h1></body></html>";
         File fileRequested = new File(rootDirectory + request.getRequestURI().getPath());
 
-        if (fileRequested.canRead()) {
-
-            log.info(String.format("HttpServlet Serving GET Request for %s", fileRequested.getName()));
-
-            response.setVersion(HTTP_VERSION);
-            response.setStatusCode("200");
-            response.setErrorMessage("OK");
-
-            try {
-                response.setContentType(Files.probeContentType(fileRequested.toPath()));
-            } catch (IOException e) {
-                log.error("Error Reading File to Determine Content-Type", e);
-            }
-            response.setContentLength(Long.valueOf(fileRequested.length()).intValue());
-
-        } else {
-            log.info(String.format("%s Not found", fileRequested.getName()));
-
-            response.setVersion(HTTP_VERSION);
-            response.setStatusCode("404");
-            response.setErrorMessage("Not Found");
-            response.setContentType("text/html");
-            response.setContentLength(NOT_FOUND_MESSAGE.length());
-
-        }
-        log.debug(response.getStatusAndHeader());
-
         try (PrintWriter writer = new PrintWriter(response.getOutputStream())) {
-            writer.println(response.getStatusAndHeader());
-            writer.flush();
 
-            if (fileRequested.canRead()) {
+            if (fileRequested.canRead() && fileRequested.isDirectory()) {
+
+                log.info(String.format("HttpServlet Serving GET Request for Directory %s",
+                        fileRequested
+                        .getName()));
+
+                response.setVersion(HTTP_VERSION);
+                response.setStatusCode("200");
+                response.setErrorMessage("OK");
+                response.setContentType("text/html");
+
+                StringBuilder fileDirectoryListingHtml = new StringBuilder();
+                fileDirectoryListingHtml.append("<html><body>");
+                for(File file : fileRequested.listFiles()) {
+                    Path rootPath = Paths.get(rootDirectory);
+                    Path fileAbsolutePath = Paths.get(file.getAbsolutePath());
+                    Path relativePath = rootPath.relativize(fileAbsolutePath);
+                    fileDirectoryListingHtml.append(String.format("<p><a href=\"%s\">%s</a></p>",
+                            relativePath.toString(), file.getName()));
+                }
+                fileDirectoryListingHtml.append("</html></body>");
+
+                response.setContentLength(fileDirectoryListingHtml.length());
+
+                writer.println(response.getStatusAndHeader());
+                writer.flush();
+                writer.print(fileDirectoryListingHtml.toString());
+
+                log.info(String.format("Directory Listing of %s Sent to Client", fileRequested
+                        .getName()));
+
+            } else if (fileRequested.canRead()) {
+
+                log.info(String.format("HttpServlet Serving GET Request for %s", fileRequested
+                        .getName()));
+
+                response.setVersion(HTTP_VERSION);
+                response.setStatusCode("200");
+                response.setErrorMessage("OK");
+
+                try {
+                    response.setContentType(Files.probeContentType(fileRequested.toPath()));
+                } catch (IOException e) {
+                    log.error("Error Reading File to Determine Content-Type", e);
+                }
+                response.setContentLength(Long.valueOf(fileRequested.length()).intValue());
+
+                writer.println(response.getStatusAndHeader());
+                writer.flush();
+
                 Files.copy(fileRequested.toPath(), response.getOutputStream());
                 log.info(String.format("%s Sent to Client", fileRequested.getName()));
+
             } else {
+
+                log.info(String.format("%s Not found", fileRequested.getName()));
+
+
+                response.setVersion(HTTP_VERSION);
+                response.setStatusCode("404");
+                response.setErrorMessage("Not Found");
+                response.setContentType("text/html");
+                response.setContentLength(NOT_FOUND_MESSAGE.length());
+
+                writer.println(response.getStatusAndHeader());
+                writer.flush();
+
                 writer.println(NOT_FOUND_MESSAGE);
                 log.info(String.format("Not Found Error Sent to Client", request.getRequestURI()
                         .getPath()));
             }
+
+            log.debug(response.getStatusAndHeader());
 
         } catch (IOException e) {
             log.error("Could Not Write GET Response to Socket", e);
@@ -128,6 +166,8 @@ public class HttpServlet {
     }
 
     public void doShutdown(HttpResponseMessage response) {
+
+        String SHUTDOWN_MESSAGE = "<html><body>Server shutting down...</body></html>";
 
         log.info("HttpServlet Serving Shutdown Request");
 
