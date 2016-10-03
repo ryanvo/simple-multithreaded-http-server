@@ -13,6 +13,11 @@ public class HttpServer {
         int POOL_SIZE = 8;
         int WORK_QUEUE_SIZE = 16;
 
+        if (args.length != 2) {
+            System.out.println("Name: Ryan Vo");
+            System.out.println("SEAS Login: ryanvo");
+        }
+
         int port = Integer.valueOf(args[0]);
         String rootDirectory = args[1];
 
