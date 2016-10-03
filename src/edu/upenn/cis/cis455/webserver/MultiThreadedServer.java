@@ -34,7 +34,7 @@ public class MultiThreadedServer {
                 }
             }
         } catch (SocketException e) {
-            log.info("ServerSocket Closed Due To Shutdown Request");
+            log.info("ServerSocket Closed Due To Shutdown Request Or Unable to Open Socket");
         } catch (IOException e) {
             log.error("HTTP Server Could Not Open Port " + port, e);
         }
