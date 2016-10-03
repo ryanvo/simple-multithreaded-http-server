@@ -2,6 +2,9 @@ package edu.upenn.cis.cis455.webserver;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Assembles the components of the multithreaded server
+ */
 public class MultiThreadedServerFactory {
 
     static Logger log = Logger.getLogger(MultiThreadedServerFactory.class);

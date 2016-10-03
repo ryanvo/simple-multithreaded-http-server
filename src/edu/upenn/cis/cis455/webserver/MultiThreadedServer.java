@@ -19,6 +19,11 @@ public class MultiThreadedServer {
         this.servlet = servlet;
     }
 
+    /**
+     * Loops to accept new connections and tells the executor to schedule them. The server stops
+     * when the ServerSocket is closed.
+     * @param port
+     */
     public void start(int port) {
 
         try {

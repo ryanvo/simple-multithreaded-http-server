@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-
 public class MyBlockingQueue {
 
     static Logger log = Logger.getLogger(MyBlockingQueue.class);

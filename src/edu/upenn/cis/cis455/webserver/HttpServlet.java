@@ -21,15 +21,28 @@ public class HttpServlet {
     private HttpRequestManager manager;
     private ServerSocket serverSocket;
 
+    /**
+     * @param rootDirectory path to the www folder
+     * @param manager needed to shutdown and get status of requests in thread pool
+     */
     public HttpServlet(String rootDirectory, HttpRequestManager manager) {
         this.rootDirectory = rootDirectory;
         this.manager = manager;
     }
 
+    /**
+     * ServerSocket must be set in order for the shutdown command to close the connection.
+     * @param serverSocket
+     */
     public void setServerSocket(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
 
+    /**
+     * Sends the request to the appropriate handling method
+     * @param request
+     * @param response
+     */
     public void service(HttpRequestMessage request, HttpResponseMessage response) {
         manager.update(Thread.currentThread().getId(), request.getRequestURI().toString());
 
@@ -54,6 +67,7 @@ public class HttpServlet {
 
         manager.update(Thread.currentThread().getId(), "waiting");
     }
+
 
     public void doGet(HttpRequestMessage request, HttpResponseMessage response) {
 
@@ -165,6 +179,11 @@ public class HttpServlet {
         log.info("Wrote Control Page Response to Socket");
     }
 
+    /**
+     * closes the server socket so that no new connections are accepted and then issues a
+     * shutdown to the manager
+     * @param response associated with the shutdown request
+     */
     public void doShutdown(HttpResponseMessage response) {
 
         String SHUTDOWN_MESSAGE = "<html><body>Server shutting down...</body></html>";

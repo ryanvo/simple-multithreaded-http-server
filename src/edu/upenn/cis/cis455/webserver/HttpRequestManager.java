@@ -3,7 +3,10 @@ package edu.upenn.cis.cis455.webserver;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * Manages the HTTP requests delegated to MyExecutorService. Maintains the status of each thread
+ * and can issue a shutdown of the entire thread pool. Used for the Control Page
+ */
 public class HttpRequestManager {
 
     private final Map<Long, String> idToUri;
@@ -17,14 +20,25 @@ public class HttpRequestManager {
         }
     }
 
+    /**
+     * Updates the status of a thread
+     * @param threadId
+     * @param uri currently serving
+     */
     public void update(long threadId, String uri) {
         idToUri.put(threadId, uri);
 }
 
+    /**
+     * Tells executor service to stop all threads
+     */
     public void issueShutdown() {
         executorService.shutdown();
     }
 
+    /**
+     * @return html string for status of the control page
+     */
     public String getHtmlResponse() {
         StringBuilder html = new StringBuilder();
 
