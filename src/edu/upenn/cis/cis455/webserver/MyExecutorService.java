@@ -34,7 +34,7 @@ public class MyExecutorService {
     public void shutdown() {
         isRunning = false;
 
-        while (!queue.isEmpty()) { //TODO graceful shutdown
+        while (!queue.isEmpty()) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ignore) {}

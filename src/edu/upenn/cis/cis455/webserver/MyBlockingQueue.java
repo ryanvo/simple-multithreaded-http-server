@@ -32,7 +32,7 @@ public class MyBlockingQueue {
 
     public synchronized Runnable take() throws InterruptedException {
         while (queue.isEmpty()) {
-                wait();
+            wait();
         }
 
         notify();
