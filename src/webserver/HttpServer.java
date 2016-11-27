@@ -1,4 +1,4 @@
-package edu.upenn.cis.cis455.webserver;
+package webserver;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -13,17 +13,8 @@ public class HttpServer {
         int POOL_SIZE = 8;
         int WORK_QUEUE_SIZE = 16;
 
-
-        if (args.length != 2) {
-            System.out.println("Name: Ryan Vo");
-            System.out.println("SEAS Login: ryanvo");
-        }
-
-//        int port = Integer.valueOf(args[0]);
-//        String rootDirectory = args[1];
-
-        int port = 8080;
-        String rootDirectory = "/home/cis555/hw1m1/www";
+        int port = Integer.valueOf(args[0]);
+        String rootDirectory = args[1];
 
         BasicConfigurator.configure();
 

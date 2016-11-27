@@ -1,6 +1,10 @@
-package edu.upenn.cis.cis455.webserver;
+package webserver;
 
 import org.apache.log4j.Logger;
+import webserver.concurrent.MyBlockingQueue;
+import webserver.concurrent.MyExecutorService;
+import webserver.http.HttpRequestManager;
+import webserver.http.HttpServlet;
 
 /**
  * Assembles the components of the multithreaded server
@@ -9,7 +13,7 @@ public class MultiThreadedServerFactory {
 
     static Logger log = Logger.getLogger(MultiThreadedServerFactory.class);
 
-    static MultiThreadedServer create(String rootDirectory, int poolSize, int workQueueSize) {
+    static public MultiThreadedServer create(String rootDirectory, int poolSize, int workQueueSize) {
 
         MyBlockingQueue workQueue = new MyBlockingQueue(workQueueSize);
         MyExecutorService exec = new MyExecutorService(poolSize, workQueue);

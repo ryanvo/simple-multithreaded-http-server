@@ -1,6 +1,4 @@
 #!/bin/sh
 
-java -classpath lib/*:bin/. edu.upenn.cis.cis455.webserver.HttpServer 8080 /home/cis455/workspace/HW1/www &
-sleep 2
-curl http://localhost:8080/control
-curl http://localhost:8080/shutdown
+java -classpath lib/*:bin/.:./target/WEB-INF/lib/webserver.jar webserver.HttpServer 80 www &
+sleep infinity
