@@ -90,7 +90,7 @@ public class HttpServlet {
                 StringBuilder fileDirectoryListingHtml = new StringBuilder();
                 fileDirectoryListingHtml.append("<html><body>");
                 for(File file : fileRequested.listFiles()) {
-                    Path rootPath = Paths.get(rootDirectory);
+                    Path rootPath = Paths.get(rootDirectory).toAbsolutePath();
                     Path fileAbsolutePath = Paths.get(file.getAbsolutePath());
                     Path relativePath = rootPath.relativize(fileAbsolutePath);
                     fileDirectoryListingHtml.append(String.format("<p><a href=\"%s\">%s</a></p>",
